@@ -11,27 +11,22 @@ fixed_image = None
 fixed = False
 
 
-header_md = """
-<|toggle|theme|>
-"""
+page = """<|toggle|theme|>
 
-page = header_md + """
 <page|layout|columns=300px 1fr|
 <|sidebar|
 ### Removing **Background**{: .color-primary} from your image
 
 <br/>
 Upload and download
-
-<|{path_upload}|file_selector|on_action=fix_image|extensions=.png;.jpg|label=Upload original image|>
+<|{path_upload}|file_selector|on_action=fix_image|extensions=.png,.jpg|label=Upload original image|>
 
 <br/>
 Download it here
-
-<|{path_download}|file_download|label=Download fixed image|bypass_preview|active={fixed}|>
+<|{path_download}|file_download|label=Download fixed image|active={fixed}|>
 |>
 
-    <container|container|part|
+<|container|
 # Image Background **Remover**{: .color-primary}
 
 🐶 Try uploading an image to watch the background magically removed. 
@@ -41,25 +36,22 @@ This code is open source and available here on [GitHub](https://github.com/Flori
 <br/>
 
 <images|layout|columns=1 1|
-            <col1|card text-center|part|render={fixed}|
-### Original Image 📷
+<col1|card text-center|part|render={fixed}|
+### Original Image 📷 
+<|{original_image}|image|>
+|col1>
 
-<center> <|{original_image}|image|> </center>
-            |col1>
+<col2|card text-center|part|render={fixed}|
+### Fixed Image 🔧 
+<|{fixed_image}|image|>
+|col2>
+|images>
 
-            <col2|card text-center|part|render={fixed}|
-### Fixed Image 🔧
-
-<center> <|{fixed_image}|image|> </center>
-            |col2>
-        |images>
-    |container>
+|>
 |page>
 """
 
 
-
-# Download the fixed image
 def convert_image(img):
     buf = BytesIO()
     img.save(buf, format="PNG")
@@ -80,6 +72,5 @@ def fix_image(state):
     state.fixed_image = convert_image(fixed_image)
     state.fixed = True
 
-
-gui = Gui(page=page)
-gui.run(margin="0px", title='Background Remover')
+if __name__ == "__main__":
+    Gui(page=page).run(margin="0px", title='Background Remover')
