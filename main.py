@@ -1,8 +1,7 @@
-from taipy.gui import Gui
+from taipy.gui import Gui, notify
 from rembg import remove
 from PIL import Image
 from io import BytesIO
-from assets.mui_theme import *
 
 
 path_upload = ""
@@ -13,15 +12,13 @@ fixed = False
 
 
 header_md = """
-<|part|class_name=header sticky|
 <|toggle|theme|>
-|>
 """
 
 page = header_md + """
-<page|layout|columns=300px 1fr|gap=0|
-    <sidebar|part|class_name=sidebar|
-# Removing Background from your image
+<page|layout|columns=300px 1fr|
+<|sidebar|
+### Removing **Background**{: .color-primary} from your image
 
 <br/>
 Upload and download
@@ -32,28 +29,26 @@ Upload and download
 Download it here
 
 <|{path_download}|file_download|label=Download fixed image|bypass_preview|active={fixed}|>
-    |sidebar>
+|>
 
-    <container|part|class_name=container|
-# Image Background Remover
-
-## Remove background from image
+    <container|container|part|
+# Image Background **Remover**{: .color-primary}
 
 🐶 Try uploading an image to watch the background magically removed. 
 Full quality images can be downloaded from the sidebar.
-This code is open source and available here on [GitHub](). Special thanks to the [rembg]() library 😁
+This code is open source and available here on [GitHub](https://github.com/FlorianJacta/demo-remove-background). Special thanks to the [rembg](https://github.com/danielgatis/rembg) library 😁
 
 <br/>
 
-        <images|layout|columns=1 1|
-            <col1|part|class_name=card|render={fixed}|
-Original Image 📷
+<images|layout|columns=1 1|
+            <col1|card text-center|part|render={fixed}|
+### Original Image 📷
 
 <center> <|{original_image}|image|> </center>
             |col1>
 
-            <col2|part|class_name=card|render={fixed}|
-Fixed Image 🔧
+            <col2|card text-center|part|render={fixed}|
+### Fixed Image 🔧
 
 <center> <|{fixed_image}|image|> </center>
             |col2>
@@ -73,15 +68,18 @@ def convert_image(img):
 
 
 def fix_image(state):
+    notify(state, 'info', 'Uploading original image...')
     image = Image.open(state.path_upload)#.rotate(90, expand=True)
     
+    notify(state, 'info', 'Removing the background...')
     fixed_image = remove(image)
     fixed_image.save("fixed_img.png")
 
+    notify(state, 'success', 'Background removed successfully!')
     state.original_image = convert_image(image)
     state.fixed_image = convert_image(fixed_image)
     state.fixed = True
 
 
 gui = Gui(page=page)
-gui.run()
+gui.run(margin="0px", title='Background Remover')
